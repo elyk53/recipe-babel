@@ -1,0 +1,39 @@
+The program is designed around a series of file format adapters/plugins. 
+Each adapter is responsible for handling the input parsing and output generation
+for its particular application. 
+The typical flow is that one adapter will parse a file, then pass the resulting
+data to another adapter, which will write it out.
+The main program knows nothing about the various file formats aside from their
+names and how to map them to their adapter.
+To allow adapters to communicate, a common notion of a recipe is defined. The current
+thinking is that this will be a superset of the notions supported by any of the supported
+adapters. For example, some formats have a single line item for an ingredient, whereas others
+separate it out into count, unit, ingredient, and variation. This will require some hueristics 
+in the adapter for formats with coarser granularity. That is probably the best place for them
+as that code is most likely to know about any application-specific quirks that might help. If 
+similar heuristics turn out to be needed in multiple places, they can always be moved to a helper library.
+There is no formal support in the infrastructure for one-way conversions, but in practice this is
+likely to happen at least on an interim basis since my initial use case only requires one-way.
+It should be sufficient to catch the exception and present a message stating that the desired direction
+is not yet supported. Plus a note in the readme about current support status.
+If I want to do something more complex than that, another option would be to define two methods
+on each adapter to indicate whether it supports input and whether it supports output, then query
+that when generating the list of valid options.
+
+A recipe consists of the following. Almost everything can be blank except the title
+* Title
+* Zero or more ingredients (zero is unlikely, but valid)
+* Cooking time
+* Prep time
+* Cooking temperature
+* Source name
+* Source URL (may be the same as source name)
+* Yield - number + unit. Unit may be blank (implied "people") for a "serves"
+* Notes
+* Rating
+
+An ingredient consists of:
+* Item
+* Quantity
+* Unit (may be blank if the implied unit is "count")
+* Variation/notes (e.g. minced, chopped, picked over, etc)
